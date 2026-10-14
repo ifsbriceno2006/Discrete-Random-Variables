@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>MTH 246 · Discrete Random Variables</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --bg:#F3F8F9; --surface:#FFFFFF; --soft:#E6F1F3; --ink:#12263A; --muted:#48606F; --line:#CFDDE3;
+  --accent:#0B7A75; --accent-ink:#FFFFFF; --sun:#F2B134; --sun-soft:#FFF4D6;
+  --bar:#0B7A75; --bar-hi:#E4572E; --good:#1B7F47; --good-soft:#E1F4E8; --bad:#B3322A; --bad-soft:#FBE6E3;
+  --head:'Bricolage Grotesque','Trebuchet MS',system-ui,sans-serif;
+  --body:'Atkinson Hyperlegible','Segoe UI',system-ui,-apple-system,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0D1923; --surface:#142530; --soft:#1B3341; --ink:#E8F1F5; --muted:#9FB6C4; --line:#2A4352;
+    --accent:#3CC4BC; --accent-ink:#06222A; --sun:#F2B134; --sun-soft:#3A3115;
+    --bar:#3CC4BC; --bar-hi:#FF8A5B; --good:#6FD39A; --good-soft:#15352A; --bad:#FF9188; --bad-soft:#3F1F1D;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0D1923; --surface:#142530; --soft:#1B3341; --ink:#E8F1F5; --muted:#9FB6C4; --line:#2A4352;
+  --accent:#3CC4BC; --accent-ink:#06222A; --sun:#F2B134; --sun-soft:#3A3115;
+  --bar:#3CC4BC; --bar-hi:#FF8A5B; --good:#6FD39A; --good-soft:#15352A; --bad:#FF9188; --bad-soft:#3F1F1D;
+}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 70px);height:100%}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.6;min-height:100%}
+h1,h2,h3{font-family:var(--head);line-height:1.2;margin:0 0 .5em;letter-spacing:-.01em}
+h1{font-size:2rem} h2{font-size:1.6rem} h3{font-size:1.2rem}
+p{margin:0 0 1em;max-width:70ch}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--ink);color:#fff;display:flex;align-items:center;gap:12px;padding:10px 16px}
+.top .title{font-family:var(--head);font-weight:700;font-size:1.05rem;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.top .prog{width:120px;height:8px;background:rgba(255,255,255,.25);border-radius:6px;overflow:hidden}
+.top .prog i{display:block;height:100%;width:0;background:var(--sun);transition:width .3s}
+.top button{background:transparent;border:1px solid rgba(255,255,255,.5);color:#fff;border-radius:8px;padding:4px 10px}
+.shell{display:grid;grid-template-columns:250px 1fr;max-width:1180px;margin:0 auto}
+nav{padding:18px 12px;position:sticky;top:calc(env(safe-area-inset-top,0px) + 52px);align-self:start;max-height:calc(100vh - 60px);overflow:auto}
+nav button{display:flex;gap:10px;align-items:center;width:100%;text-align:left;background:none;border:0;border-radius:10px;padding:9px 12px;color:var(--muted);font-weight:700}
+nav button:hover{background:var(--soft)}
+nav button[aria-current="true"]{background:var(--accent);color:var(--accent-ink)}
+nav .dot{width:20px;text-align:center}
+main{padding:22px 22px 80px;min-width:0}
+section.lesson{display:none}
+section.lesson.on{display:block}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin:0 0 18px}
+.callout{border-left:6px solid var(--sun);background:var(--sun-soft);padding:12px 16px;border-radius:0 12px 12px 0;margin:0 0 18px}
+.callout.teal{border-color:var(--accent);background:var(--soft)}
+.formula{background:var(--soft);border-radius:10px;padding:10px 14px;margin:8px 0 14px;font-size:1.08rem;overflow-x:auto}
+.formula i,.formula var{font-family:Georgia,'Times New Roman',serif;font-style:italic}
+.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.dcard{background:var(--surface);border:1px solid var(--line);border-top:5px solid var(--accent);border-radius:12px;padding:14px 16px}
+.dcard b{font-family:var(--head);font-size:1.1rem}
+.btn{background:var(--accent);color:var(--accent-ink);border:0;border-radius:10px;padding:9px 16px;font-weight:700}
+.btn.ghost{background:transparent;color:var(--ink);border:2px solid var(--line)}
+.btn:disabled{opacity:.45;cursor:default}
+.nextrow{display:flex;justify-content:space-between;gap:10px;margin-top:26px}
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px}
+.tabs button{background:var(--surface);border:2px solid var(--line);border-radius:999px;padding:6px 14px;font-weight:700}
+.tabs button[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+table.t{border-collapse:collapse;margin:6px 0 12px;min-width:260px}
+table.t th,table.t td{border:1px solid var(--line);padding:6px 10px;text-align:center}
+table.t th{background:var(--soft)}
+input[type=number]{font:inherit;width:84px;padding:5px 8px;border:2px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink)}
+select{font:inherit;padding:5px 8px;border:2px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink)}
+input[type=range]{width:100%;accent-color:var(--accent)}
+.scroll{overflow-x:auto}
+.ctrl{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));margin-bottom:10px}
+.ctrl label{font-weight:700;font-size:.95rem;display:block}
+.readout{display:flex;flex-wrap:wrap;gap:10px;margin:8px 0}
+.readout span{background:var(--soft);border-radius:999px;padding:4px 14px;font-weight:700}
+.big{background:var(--accent);color:var(--accent-ink);border-radius:12px;padding:10px 16px;font-weight:700;font-size:1.15rem;margin:10px 0}
+svg.chart{width:100%;height:auto;display:block;background:var(--surface);border:1px solid var(--line);border-radius:12px}
+svg.chart text{fill:var(--muted);font-family:var(--body);font-size:12px}
+.q{border-top:1px dashed var(--line);padding-top:12px;margin-top:12px}
+.opts{display:grid;gap:8px;margin:8px 0}
+.opts button{text-align:left;background:var(--surface);border:2px solid var(--line);border-radius:10px;padding:8px 12px}
+.opts button:hover:not(:disabled){border-color:var(--accent)}
+.opts button.right{background:var(--good-soft);border-color:var(--good)}
+.opts button.wrong{background:var(--bad-soft);border-color:var(--bad)}
+.fb{margin-top:6px;padding:8px 12px;border-radius:10px;display:none}
+.fb.show{display:block}
+.fb.ok{background:var(--good-soft)} .fb.no{background:var(--bad-soft)}
+.step{background:var(--soft);border-radius:10px;padding:8px 14px;margin:8px 0}
+.step b{color:var(--accent)}
+.score{font-family:var(--head);font-size:1.3rem}
+.pill{display:inline-block;background:var(--sun);color:#12263A;border-radius:999px;padding:1px 10px;font-weight:700;font-size:.85rem}
+details.ex{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 16px;margin:0 0 12px}
+details.ex summary{cursor:pointer;font-weight:700;font-family:var(--head);font-size:1.1rem}
+.cheat{font-size:.95rem}
+.cheat td,.cheat th{text-align:left}
+@media (max-width:820px){
+  .shell{grid-template-columns:1fr}
+  nav{position:static;max-height:none;display:none;padding:8px 12px;background:var(--surface);border-bottom:1px solid var(--line)}
+  nav.open{display:block}
+  main{padding:16px 14px 70px}
+  .top .prog{width:70px}
+}
+@media (min-width:821px){ #menuBtn{display:none} }
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="top">
+  <button id="menuBtn" aria-label="Open lesson menu">☰ Menu</button>
+  <div class="title">MTH 246 · Discrete Random Variables</div>
+  <div class="prog" title="Your progress"><i id="progBar"></i></div>
+  <button id="themeBtn" aria-label="Switch light or dark theme">🌓</button>
+</div>
+<div class="shell">
+  <nav id="nav" aria-label="Lessons"></nav>
+  <main id="main">
+
+<!-- 0 ROADMAP -->
+<section class="lesson" data-title="Roadmap" data-icon="🧭">
+  <h1>Discrete Random Variables</h1>
+  <p>Welcome! 👋 In this module you will learn how to describe, calculate with, and apply the probability models used when we <b>count</b> things. Work through the lessons in order; each one has short checks that give instant feedback.</p>
+
+  <div class="card">
+    <h3>📋 What we will do</h3>
+    <ol>
+      <li><b>Introduction:</b> what a random variable is, and how discrete differs from continuous.</li>
+      <li><b>Definition and description:</b> the probability distribution function (PDF), its two rules, and the mean, variance and standard deviation.</li>
+      <li><b>The distributions:</b> definition, conditions, formulas and an interactive graph for each model.</li>
+      <li><b>Choosing the right model:</b> a decision practice with real situations.</li>
+      <li><b>Worked examples:</b> full solutions you reveal step by step.</li>
+      <li><b>Applications and practice:</b> real-world uses, a quiz, and a summary sheet.</li>
+    </ol>
+  </div>
+
+  <h3>🎲 The six discrete distributions covered</h3>
+  <div class="grid">
+    <div class="dcard"><b>Discrete uniform</b><br>Every value in a list is equally likely (a fair die).</div>
+    <div class="dcard"><b>Bernoulli</b><br>One trial with two outcomes: success or failure.</div>
+    <div class="dcard"><b>Binomial</b><br>Number of successes in <i>n</i> independent trials.</div>
+    <div class="dcard"><b>Geometric</b><br>Number of trials needed to get the <i>first</i> success.</div>
+    <div class="dcard"><b>Hypergeometric</b><br>Number of successes when sampling <i>without</i> replacement.</div>
+    <div class="dcard"><b>Poisson</b><br>Number of events in a fixed interval of time or space.</div>
+  </div>
+
+  <div class="callout teal" style="margin-top:18px"><b>🎯 By the end you can:</b> identify a discrete random variable · build and check a probability distribution · find a mean and standard deviation · choose the correct distribution for a situation · calculate probabilities for each of the six models.</div>
+  <div class="nextrow"><span></span><button class="btn" data-go="1">Start lesson 1 ▶</button></div>
+</section>
+
+<!-- 1 INTRO -->
+<section class="lesson" data-title="Introduction" data-icon="1️⃣">
+  <h2>1 · What is a random variable?</h2>
+  <p>A <b>random experiment</b> is a process whose result is uncertain, such as tossing a coin or counting the students absent today. A <b>random variable</b> turns each outcome into a <b>number</b>.</p>
+  <div class="callout teal"><b>Notation:</b> a capital letter (<i>X</i>) names the random variable. A lowercase letter (<i>x</i>) is one particular value it can take. <i>P</i>(<i>X</i> = <i>x</i>) means “the probability that <i>X</i> equals <i>x</i>”.</div>
+  <div class="card">
+    <h3>🪙 Example</h3>
+    <p>Toss a fair coin 3 times. Let <i>X</i> = the number of heads. The outcomes HHH, HHT, HTH, … are turned into the numbers <i>x</i> = 0, 1, 2 or 3. Nothing else is possible, so <i>X</i> has only four values.</p>
+  </div>
+  <h3>Discrete or continuous?</h3>
+  <p>A random variable is <b>discrete</b> if its possible values can be <b>counted</b>: a finite list, or an unending list such as 0, 1, 2, 3, … It is <b>continuous</b> if it is <b>measured</b> and can take any value in an interval, including decimals.</p>
+  <div class="card">
+    <h3>🧪 Try it: classify each variable</h3><p><b>Directions:</b> for each variable, tap <i>Discrete</i> or <i>Continuous</i>. You will see feedback straight away.</p>
+    <div id="classify"></div>
+  </div>
+  <div class="card"><h3>✅ Learning check</h3><div id="quiz1"></div></div>
+  <div class="nextrow"><button class="btn ghost" data-go="0">◀ Back</button><button class="btn" data-go="2">Next ▶</button></div>
+</section>
+
+<!-- 2 DEFINITION -->
+<section class="lesson" data-title="Definition & description" data-icon="2️⃣">
+  <h2>2 · Describing a discrete random variable</h2>
+  <p>A <b>discrete random variable</b> <i>X</i> takes countable values <i>x</i>₁, <i>x</i>₂, <i>x</i>₃, … Its <b>probability distribution function (PDF)</b> lists every value with its probability, <i>P</i>(<i>x</i>) = <i>P</i>(<i>X</i> = <i>x</i>). You can show it as a <b>table</b>, a <b>formula</b>, or a <b>graph</b>.</p>
+  <div class="callout teal"><b>📝 Terminology:</b> Many textbooks call this the “probability distribution function (PDF)” for a discrete variable. Strictly, it is the <b>probability mass function (pmf)</b>, and “PDF” is normally kept for continuous variables. You may see either name, so know both.</div>
+  <div class="callout"><b>⚖️ Two rules every PDF must satisfy</b>
+    <div class="formula" style="margin-bottom:0">1) &nbsp;0 ≤ <i>P</i>(<i>x</i>) ≤ 1 for every <i>x</i> &nbsp;&nbsp;&nbsp; 2) &nbsp;Σ <i>P</i>(<i>x</i>) = 1 (all probabilities add to 1)</div>
+  </div>
+  <h3>Centre and spread</h3>
+  <div class="formula">Mean (expected value): &nbsp;μ = <i>E</i>(<i>X</i>) = Σ <i>x</i> · <i>P</i>(<i>x</i>)<br>
+  Variance: &nbsp;σ² = Σ (<i>x</i> − μ)² · <i>P</i>(<i>x</i>) = <i>E</i>(<i>X</i>²) − μ²<br>
+  Standard deviation: &nbsp;σ = √σ²</div>
+  <p>The mean is the <b>long-run average</b> over many repetitions. It does not have to be a possible value of <i>X</i>. The standard deviation measures how far values typically fall from the mean.</p>
+  <div class="card">
+    <h3>🧮 Build your own distribution</h3>
+    <p>Edit the table. The checks and the graph update at once. Try making the probabilities add to something other than 1.</p>
+    <div class="scroll"><table class="t" id="bTable"></table></div>
+    <button class="btn ghost" id="addRow">➕ Add a value</button>
+    <button class="btn ghost" id="delRow">➖ Remove last</button>
+    <div id="bOut"></div>
+    <div id="bChart"></div>
+  </div>
+  <div class="card"><h3>✅ Learning check</h3><div id="quiz2"></div></div>
+  <div class="nextrow"><button class="btn ghost" data-go="1">◀ Back</button><button class="btn" data-go="3">Next ▶</button></div>
+</section>
+
+<!-- 3 DISTRIBUTIONS -->
+<section class="lesson" data-title="The distributions" data-icon="3️⃣">
+  <h2>3 · The discrete distributions</h2>
+  <p>Pick a distribution. Read what it models, check its conditions, then use the <b>explorer</b>: move the sliders and watch the graph and the probability calculator respond.</p>
+  <div class="tabs" id="dTabs" role="tablist"></div>
+  <div id="dPanel"></div>
+  <div class="nextrow"><button class="btn ghost" data-go="2">◀ Back</button><button class="btn" data-go="4">Next ▶</button></div>
+</section>
+
+<!-- 4 CHOOSE -->
+<section class="lesson" data-title="Choosing the model" data-icon="4️⃣">
+  <h2>4 · Which distribution fits?</h2>
+  <p>Before calculating, ask these questions in order:</p>
+  <div class="card">
+    <ol>
+      <li>Is there only <b>one</b> trial? → <b>Bernoulli</b></li>
+      <li>Are all values in a list <b>equally likely</b>? → <b>Discrete uniform</b></li>
+      <li>Are we counting <b>successes in a fixed number</b> of trials?
+        <ul><li>Independent trials (or sampling with replacement) → <b>Binomial</b></li>
+        <li>Sampling <b>without</b> replacement from a small population → <b>Hypergeometric</b></li></ul></li>
+      <li>Are we counting <b>trials until the first success</b>? → <b>Geometric</b></li>
+      <li>Are we counting <b>events in an interval</b> of time or space, with a known average rate? → <b>Poisson</b></li>
+    </ol>
+  </div>
+  <div class="card"><h3>🧠 Practice: name the model</h3><p><b>Directions:</b> read each situation, check it against the conditions from Lesson 3, then tap the distribution that fits.</p><div id="chooser"></div></div>
+  <div class="nextrow"><button class="btn ghost" data-go="3">◀ Back</button><button class="btn" data-go="5">Next ▶</button></div>
+</section>
+
+<!-- 5 WORKED -->
+<section class="lesson" data-title="Worked examples" data-icon="5️⃣">
+  <h2>5 · Worked examples</h2>
+  <p>Open an example, try it on paper first, then press <b>Show next step</b> to check your work.</p>
+  <div id="examples"></div>
+  <div class="nextrow"><button class="btn ghost" data-go="4">◀ Back</button><button class="btn" data-go="6">Next ▶</button></div>
+</section>
+
+<!-- 6 APPLICATIONS -->
+<section class="lesson" data-title="Applications" data-icon="6️⃣">
+  <h2>6 · Practical applications</h2>
+  <p>Discrete distributions are used wherever we count. Choose a field to see how each model is used, then try the “what-if” tool.</p>
+  <div class="grid" id="apps"></div>
+  <div class="card" style="margin-top:18px">
+    <h3>🔬 What-if: quality control sampling</h3>
+    <p>A packing line produces items with a defect rate <i>p</i>. You inspect a sample of <i>n</i> items and reject the batch if you find <b>at least one</b> defective. How likely is a rejection?</p>
+    <div class="ctrl">
+      <div><label>Defect rate p = <span id="wp">5</span>%</label><input type="range" id="wpIn" min="1" max="30" value="5"></div>
+      <div><label>Sample size n = <span id="wn">10</span></label><input type="range" id="wnIn" min="1" max="60" value="10"></div>
+    </div>
+    <div class="big" id="wOut"></div>
+    <p>Rule used: <i>P</i>(at least one) = 1 − <i>P</i>(<i>X</i> = 0) = 1 − (1 − <i>p</i>)<sup><i>n</i></sup>. Notice how a larger sample catches problems much more reliably.</p>
+  </div>
+  <div class="nextrow"><button class="btn ghost" data-go="5">◀ Back</button><button class="btn" data-go="7">Next ▶</button></div>
+</section>
+
+<!-- 7 PRACTICE -->
+<section class="lesson" data-title="Practice & summary" data-icon="7️⃣">
+  <h2>7 · Practice quiz and summary</h2>
+  <div class="card"><h3>📝 Final quiz</h3><p><b>Directions:</b> for multiple-choice questions, tap the best answer to see feedback straight away. For typed answers, enter a decimal and press <i>Check</i>; answers within rounding of the correct value are accepted. Use paper for your working.</p><div id="finalQuiz"></div><div class="score" id="finalScore"></div></div>
+  <div class="card">
+    <h3>📑 Summary sheet</h3>
+    <div class="scroll"><table class="t cheat">
+      <tr><th>Distribution</th><th>Models</th><th><i>P</i>(<i>X</i> = <i>x</i>)</th><th>Mean</th><th>Variance</th></tr>
+      <tr><td>Uniform (<i>a</i> to <i>b</i>)</td><td>Equally likely integers</td><td>1 / (<i>b</i> − <i>a</i> + 1)</td><td>(<i>a</i> + <i>b</i>) / 2</td><td>[(<i>b</i> − <i>a</i> + 1)² − 1] / 12</td></tr>
+      <tr><td>Bernoulli(<i>p</i>)</td><td>One trial</td><td><i>p</i><sup><i>x</i></sup>(1 − <i>p</i>)<sup>1−<i>x</i></sup>, <i>x</i> = 0, 1</td><td><i>p</i></td><td><i>pq</i></td></tr>
+      <tr><td>Binomial(<i>n</i>, <i>p</i>)</td><td>Successes in <i>n</i> trials</td><td>C(<i>n</i>, <i>x</i>) <i>p</i><sup><i>x</i></sup><i>q</i><sup><i>n</i>−<i>x</i></sup></td><td><i>np</i></td><td><i>npq</i></td></tr>
+      <tr><td>Geometric(<i>p</i>)</td><td>Trials to first success</td><td><i>q</i><sup><i>x</i>−1</sup><i>p</i>, <i>x</i> = 1, 2, …</td><td>1 / <i>p</i></td><td><i>q</i> / <i>p</i>²</td></tr>
+      <tr><td>Hypergeometric(<i>N</i>, <i>K</i>, <i>n</i>)</td><td>Successes, no replacement</td><td>C(<i>K</i>, <i>x</i>) C(<i>N</i>−<i>K</i>, <i>n</i>−<i>x</i>) / C(<i>N</i>, <i>n</i>)</td><td><i>nK</i> / <i>N</i></td><td><i>n</i>(<i>K</i>/<i>N</i>)(1−<i>K</i>/<i>N</i>)(<i>N</i>−<i>n</i>)/(<i>N</i>−1)</td></tr>
+      <tr><td>Poisson(λ)</td><td>Events in an interval</td><td><i>e</i><sup>−λ</sup> λ<sup><i>x</i></sup> / <i>x</i>!</td><td>λ</td><td>λ</td></tr>
+    </table></div>
+    <p><i>q</i> = 1 − <i>p</i>. C(<i>n</i>, <i>x</i>) = <i>n</i>! / [<i>x</i>!(<i>n</i> − <i>x</i>)!].</p>
+  </div>
+  <div class="nextrow"><button class="btn ghost" data-go="6">◀ Back</button><button class="btn" data-go="0">Back to roadmap 🧭</button></div>
+</section>
+
+  </main>
+</div>
+
+<script>
+/* ---------- helpers ---------- */
+var LF=[0];for(var i=1;i<=400;i++)LF[i]=LF[i-1]+Math.log(i);
+function lnC(n,k){return (k<0||k>n)?-Infinity:LF[n]-LF[k]-LF[n-k];}
+function fmt(x,d){d=d==null?4:d;if(!isFinite(x))return '—';return (Math.abs(x)<1e-4&&x!==0)?x.toExponential(2):String(+x.toFixed(d));}
+function $(s,el){return (el||document).querySelector(s);}
+function el(tag,cls,html){var e=document.createElement(tag);if(cls)e.className=cls;if(html!=null)e.innerHTML=html;return e;}
+
+/* ---------- navigation ---------- */
+var lessons=[].slice.call(document.querySelectorAll('section.lesson'));
+var nav=$('#nav'),cur=0,visited={};
+lessons.forEach(function(s,i){
+  var b=el('button',null,'<span class="dot">'+s.dataset.icon+'</span><span>'+s.dataset.title+'</span>');
+  b.addEventListener('click',function(){go(i);nav.classList.remove('open');});
+  nav.appendChild(b);
+});
+function go(i){
+  cur=i;visited[i]=1;
+  lessons.forEach(function(s,k){s.classList.toggle('on',k===i);});
+  [].forEach.call(nav.children,function(b,k){b.setAttribute('aria-current',k===i?'true':'false');});
+  $('#progBar').style.width=(Object.keys(visited).length/lessons.length*100)+'%';
+  window.scrollTo(0,0);
+}
+document.addEventListener('click',function(e){var g=e.target.closest('[data-go]');if(g)go(+g.dataset.go);});
+$('#menuBtn').onclick=function(){nav.classList.toggle('open');};
+$('#themeBtn').onclick=function(){
+  var r=document.documentElement,dark=getComputedStyle(r).getPropertyValue('--bg').trim()==='#0D1923';
+  r.setAttribute('data-theme',dark?'light':'dark');
+};
+
+/* ---------- quiz engine ---------- */
+function makeQuiz(box,qs,onDone){
+  var score=0,answered=0;
+  qs.forEach(function(q,qi){
+    var d=el('div','q');
+    d.appendChild(el('div',null,'<b>Q'+(qi+1)+'.</b> '+q.q));
+    var fb=el('div','fb');
+    function finish(ok){
+      answered++;if(ok)score++;
+      fb.className='fb show '+(ok?'ok':'no');
+      fb.innerHTML=(ok?'✅ <b>Correct!</b> ':'❌ <b>Not quite.</b> ')+q.why;
+      if(onDone&&answered===qs.length)onDone(score,qs.length);
+    }
+    if(q.opts){
+      var o=el('div','opts');
+      q.opts.forEach(function(t,ti){
+        var b=el('button',null,t);
+        b.onclick=function(){
+          [].forEach.call(o.children,function(x,k){x.disabled=true;if(k===q.ans)x.classList.add('right');});
+          if(ti!==q.ans)b.classList.add('wrong');
+          finish(ti===q.ans);
+        };
+        o.appendChild(b);
+      });
+      d.appendChild(o);
+    }else{
+      var row=el('div',null,'');
+      var inp=el('input');inp.type='number';inp.step='any';inp.setAttribute('aria-label','Your answer');
+      var chk=el('button','btn','Check');chk.style.marginLeft='8px';
+      chk.onclick=function(){
+        if(inp.value==='')return;
+        var ok=Math.abs(+inp.value-q.num)<=q.tol;
+        inp.disabled=true;chk.disabled=true;finish(ok);
+      };
+      row.appendChild(inp);row.appendChild(chk);d.appendChild(row);
+    }
+    d.appendChild(fb);box.appendChild(d);
+  });
+}
+
+/* ---------- lesson 1 ---------- */
+(function(){
+  var items=[['Number of students absent today',1],['Time a student takes to run 100 m',0],['Number of goals scored in a match',1],['Height of a sunflower',0],['Number of coin tosses until the first head',1],['Weight of a mango',0]];
+  var box=$('#classify');
+  items.forEach(function(it){
+    var r=el('div','q');r.style.paddingTop='8px';r.style.marginTop='8px';
+    r.appendChild(el('div',null,it[0]));
+    var o=el('div','opts');o.style.gridTemplateColumns='1fr 1fr';
+    var fb=el('div','fb');
+    ['Discrete (counted)','Continuous (measured)'].forEach(function(t,k){
+      var b=el('button',null,t);
+      b.onclick=function(){
+        var ok=(k===0)===!!it[1];
+        [].forEach.call(o.children,function(x){x.disabled=true;});
+        b.classList.add(ok?'right':'wrong');
+        fb.className='fb show '+(ok?'ok':'no');
+        fb.innerHTML=ok?'✅ Correct!':'❌ Look again: '+(it[1]?'this is a count, so it is discrete.':'this is a measurement on a scale, so it is continuous.');
+      };
+      o.appendChild(b);
+    });
+    r.appendChild(o);r.appendChild(fb);box.appendChild(r);
+  });
+  makeQuiz($('#quiz1'),[
+    {q:'Which of these is a discrete random variable?',opts:['The temperature of a classroom','The number of cars passing a checkpoint in one hour','The time until a bus arrives','The length of a pencil'],ans:1,why:'Cars are counted: 0, 1, 2, … The other three are measured.'},
+    {q:'Two dice are rolled and <i>X</i> is the sum. Which values can <i>X</i> take?',opts:['Any number between 1 and 12','The whole numbers 2 to 12','The whole numbers 1 to 6','Only even numbers'],ans:1,why:'The smallest sum is 1 + 1 = 2 and the largest is 6 + 6 = 12, and only whole numbers occur.'}
+  ]);
+})();
+
+/* ---------- chart ---------- */
+function barChart(host,xs,ps,hi,opts){
+  opts=opts||{};
+  var W=640,H=290,L=46,R=14,T=16,B=40;
+  var pm=Math.max.apply(null,ps.concat([0.0001]));
+  var top=Math.min(1,Math.ceil(pm*10+0.0001)/10);if(top<pm)top=Math.min(1,pm*1.1);
+  var n=xs.length,bw=(W-L-R)/n;
+  var s='<svg class="chart" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Probability bar chart">';
+  for(var g=0;g<=4;g++){var v=top*g/4,y=H-B-(H-B-T)*g/4;
+    s+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+y+'" y2="'+y+'" stroke="var(--line)"/><text x="'+(L-6)+'" y="'+(y+4)+'" text-anchor="end">'+fmt(v,2)+'</text>';}
+  var step=Math.ceil(n/16);
+  xs.forEach(function(x,i){
+    var h=(H-B-T)*ps[i]/top,bx=L+i*bw+bw*0.12,w=bw*0.76;
+    var on=hi&&hi(x);
+    s+='<rect x="'+bx+'" y="'+(H-B-h)+'" width="'+w+'" height="'+Math.max(h,0)+'" rx="2" fill="'+(on?'var(--bar-hi)':'var(--bar)')+'"><title>P(X = '+x+') = '+fmt(ps[i],5)+'</title></rect>';
+    if(i%step===0)s+='<text x="'+(bx+w/2)+'" y="'+(H-B+16)+'" text-anchor="middle">'+x+'</text>';
+    if(n<=12&&ps[i]>0.0005)s+='<text x="'+(bx+w/2)+'" y="'+(H-B-h-4)+'" text-anchor="middle" style="font-weight:700;fill:var(--ink)">'+fmt(ps[i],3)+'</text>';
+  });
+  s+='<text x="'+(W/2)+'" y="'+(H-6)+'" text-anchor="middle">x</text>';
+  if(opts.mean!=null&&xs.length){
+    var x0=xs[0],mx=L+((opts.mean-x0)+0.5)*bw;
+    if(mx>=L&&mx<=W-R)s+='<line x1="'+mx+'" x2="'+mx+'" y1="'+T+'" y2="'+(H-B)+'" stroke="var(--sun)" stroke-width="3" stroke-dasharray="6 4"/><text x="'+(mx+5)+'" y="'+(T+12)+'" style="fill:var(--ink);font-weight:700">mean</text>';
+  }
+  s+='</svg>';
+  host.innerHTML=s;
+}
+
+/* ---------- lesson 2 builder ---------- */
+(function(){
+  var rows=[[0,0.1],[1,0.3],[2,0.4],[3,0.2]];
+  var tb=$('#bTable');
+  function draw(){
+    var h='<tr><th><i>x</i></th>'+rows.map(function(r,i){return '<td><input type="number" step="1" data-i="'+i+'" data-k="0" value="'+r[0]+'" aria-label="x value '+(i+1)+'"></td>';}).join('')+'</tr>';
+    h+='<tr><th><i>P</i>(<i>x</i>)</th>'+rows.map(function(r,i){return '<td><input type="number" step="0.01" min="0" max="1" data-i="'+i+'" data-k="1" value="'+r[1]+'" aria-label="probability '+(i+1)+'"></td>';}).join('')+'</tr>';
+    tb.innerHTML=h;
+    [].forEach.call(tb.querySelectorAll('input'),function(inp){
+      inp.oninput=function(){var v=parseFloat(inp.value);rows[+inp.dataset.i][+inp.dataset.k]=isNaN(v)?0:v;calc();};
+    });
+    calc();
+  }
+  function calc(){
+    var sum=0,mu=0,ex2=0,okRange=true,seen={},distinct=true,allInt=true;
+    rows.forEach(function(r){sum+=r[1];mu+=r[0]*r[1];ex2+=r[0]*r[0]*r[1];if(r[1]<0||r[1]>1)okRange=false;if(seen[r[0]])distinct=false;seen[r[0]]=1;if(Math.floor(r[0])!==r[0])allInt=false;});
+    var v=ex2-mu*mu,sd=Math.sqrt(Math.max(v,0)),valid=okRange&&distinct&&Math.abs(sum-1)<1e-9;
+    var cum=0,srt=rows.slice().sort(function(a,b){return a[0]-b[0];}),cdf=srt.map(function(r){cum+=r[1];return 'P(X ≤ '+r[0]+') = '+fmt(cum,3);}).join(', ');
+    $('#bOut').innerHTML='<div class="readout"><span>Σ P(x) = '+fmt(sum,4)+'</span><span>0 ≤ P(x) ≤ 1: '+(okRange?'✅':'❌')+'</span><span>Each x listed once: '+(distinct?'✅':'❌')+'</span><span>Valid PDF? '+(valid?'✅ Yes':'❌ No')+'</span></div>'+
+      (valid?'<div class="readout"><span>μ = E(X) = '+fmt(mu,4)+'</span><span>E(X²) = '+fmt(ex2,4)+'</span><span>σ² = '+fmt(v,4)+'</span><span>σ = '+fmt(sd,4)+'</span></div><p>Cumulative probabilities: '+cdf+'</p>':'<p>Make the probabilities add to exactly 1, keep each between 0 and 1, and list each x only once, to see the mean and standard deviation.</p>');
+    var sorted=rows.slice().sort(function(a,b){return a[0]-b[0];});
+    if(sorted.length&&valid&&allInt&&sorted[sorted.length-1][0]-sorted[0][0]<=40){var gx=[],gp=[],lookup={};sorted.forEach(function(r){lookup[r[0]]=r[1];});for(var gk=sorted[0][0];gk<=sorted[sorted.length-1][0];gk++){gx.push(gk);gp.push(lookup[gk]||0);}barChart($('#bChart'),gx,gp,null,{mean:mu});}
+    else $('#bChart').innerHTML=(valid&&!allInt)?'<p>The graph is drawn for whole-number values of x only.</p>':'';
+  }
+  $('#addRow').onclick=function(){rows.push([rows.length?rows[rows.length-1][0]+1:0,0]);draw();};
+  $('#delRow').onclick=function(){if(rows.length>1){rows.pop();draw();}};
+  draw();
+  makeQuiz($('#quiz2'),[
+    {q:'A table shows <i>P</i>(1) = 0.2, <i>P</i>(2) = 0.3, <i>P</i>(3) = 0.4 and <i>P</i>(4) = <i>k</i>. What is <i>k</i>?',opts:['0.05','0.1','0.2','0.9'],ans:1,why:'The probabilities must add to 1: 0.2 + 0.3 + 0.4 = 0.9, so <i>k</i> = 1 − 0.9 = 0.1.'},
+    {q:'For <i>x</i> = 1, 2, 3 with <i>P</i>(<i>x</i>) = 0.5, 0.3, 0.2, what is the mean <i>E</i>(<i>X</i>)? (type the number)',num:1.7,tol:0.005,why:'E(X) = 1(0.5) + 2(0.3) + 3(0.2) = 0.5 + 0.6 + 0.6 = 1.7.'},
+    {q:'Which statement about the mean of a discrete random variable is true?',opts:['It must be one of the values of <i>X</i>','It is the long-run average of <i>X</i>','It is always the most likely value','It is always the middle value'],ans:1,why:'The mean is the long-run average. For example, a fair die has mean 3.5, which is not a possible roll.'}
+  ]);
+})();
+
+/* ---------- distributions ---------- */
+function geoMaxX(p){return Math.min(60,Math.max(8,Math.ceil(Math.log(0.001)/Math.log(1-p))));}
+var D={
+ uniform:{name:'Discrete uniform',icon:'🎲',
+  models:'Every value in a list of consecutive integers is <b>equally likely</b>, such as a fair die, a random raffle number, or a randomly chosen student ID from a range.',
+  conds:['A finite set of consecutive integers from <i>a</i> to <i>b</i>','Every value has the <b>same</b> probability'],
+  notation:'<i>X</i> ~ Uniform(<i>a</i>, <i>b</i>)',
+  formula:'<i>P</i>(<i>X</i> = <i>x</i>) = 1 / (<i>b</i> − <i>a</i> + 1), &nbsp;<i>x</i> = <i>a</i>, <i>a</i>+1, …, <i>b</i>',
+  mv:'μ = (<i>a</i> + <i>b</i>) / 2 &nbsp;&nbsp; σ² = [(<i>b</i> − <i>a</i> + 1)² − 1] / 12',
+  tip:'A fair six-sided die is Uniform(1, 6): each face has probability 1/6 and the mean is 3.5.',
+  params:[{id:'a',l:'Smallest value a',min:0,max:10,v:1,s:1},{id:'b',l:'Largest value b',min:1,max:20,v:6,s:1}],
+  fix:function(p){if(p.b<=p.a)p.b=p.a+1;},
+  sup:function(p){var r=[];for(var k=p.a;k<=p.b;k++)r.push(k);return r;},
+  pmf:function(k,p){return (k>=p.a&&k<=p.b)?1/(p.b-p.a+1):0;},
+  mean:function(p){return (p.a+p.b)/2;},
+  vari:function(p){var m=p.b-p.a+1;return (m*m-1)/12;}},
+ bernoulli:{name:'Bernoulli',icon:'🪙',
+  models:'<b>One</b> trial with exactly two outcomes: success (1) or failure (0), such as one free throw or one test item answered correctly.',
+  conds:['Exactly <b>one</b> trial','Two outcomes only: success or failure','<i>P</i>(success) = <i>p</i>'],
+  notation:'<i>X</i> ~ Bernoulli(<i>p</i>)',
+  formula:'<i>P</i>(<i>X</i> = <i>x</i>) = <i>p</i><sup><i>x</i></sup>(1 − <i>p</i>)<sup>1−<i>x</i></sup>, &nbsp;<i>x</i> = 0, 1',
+  mv:'μ = <i>p</i> &nbsp;&nbsp; σ² = <i>p</i>(1 − <i>p</i>)',
+  tip:'A Bernoulli variable is the building block of the binomial: add up <i>n</i> independent Bernoulli trials.',
+  params:[{id:'p',l:'Probability of success p',min:0.01,max:0.99,v:0.6,s:0.01}],
+  sup:function(){return [0,1];},
+  pmf:function(k,p){return k===1?p.p:k===0?1-p.p:0;},
+  mean:function(p){return p.p;},vari:function(p){return p.p*(1-p.p);}},
+ binomial:{name:'Binomial',icon:'✅',
+  models:'The <b>number of successes</b> in a fixed number <i>n</i> of independent trials, each with the same success probability <i>p</i>.',
+  conds:['A <b>fixed</b> number of trials, <i>n</i>','Each trial has two outcomes: success or failure','Trials are <b>independent</b>','<i>p</i> is the <b>same</b> on every trial'],
+  notation:'<i>X</i> ~ B(<i>n</i>, <i>p</i>)',
+  formula:'<i>P</i>(<i>X</i> = <i>x</i>) = C(<i>n</i>, <i>x</i>) <i>p</i><sup><i>x</i></sup> (1 − <i>p</i>)<sup><i>n</i>−<i>x</i></sup>, &nbsp;<i>x</i> = 0, 1, …, <i>n</i>',
+  mv:'μ = <i>np</i> &nbsp;&nbsp; σ² = <i>np</i>(1 − <i>p</i>)',
+  tip:'“At least one” is easiest with the complement: <i>P</i>(<i>X</i> ≥ 1) = 1 − <i>P</i>(<i>X</i> = 0).',
+  params:[{id:'n',l:'Number of trials n',min:1,max:40,v:10,s:1},{id:'p',l:'Probability of success p',min:0.01,max:0.99,v:0.3,s:0.01}],
+  sup:function(p){var r=[];for(var k=0;k<=p.n;k++)r.push(k);return r;},
+  pmf:function(k,p){if(k<0||k>p.n)return 0;return Math.exp(lnC(p.n,k)+k*Math.log(p.p)+(p.n-k)*Math.log(1-p.p));},
+  mean:function(p){return p.n*p.p;},vari:function(p){return p.n*p.p*(1-p.p);}},
+ geometric:{name:'Geometric',icon:'🎯',
+  models:'The <b>trial number on which the first success occurs</b>, when independent trials are repeated until a success happens.',
+  conds:['Independent trials, each success or failure','<i>p</i> is the <b>same</b> on every trial','We count trials <b>until the first success</b> (no fixed <i>n</i>)'],
+  notation:'<i>X</i> ~ G(<i>p</i>), with <i>X</i> = 1, 2, 3, …',
+  formula:'<i>P</i>(<i>X</i> = <i>x</i>) = (1 − <i>p</i>)<sup><i>x</i>−1</sup> <i>p</i> &nbsp;&nbsp; <i>P</i>(<i>X</i> ≤ <i>x</i>) = 1 − (1 − <i>p</i>)<sup><i>x</i></sup>',
+  mv:'μ = 1 / <i>p</i> &nbsp;&nbsp; σ² = (1 − <i>p</i>) / <i>p</i>²',
+  tip:'Here <i>X</i> counts <b>all trials including the successful one</b>, so the smallest value is 1. The graph always decreases. Some texts instead count the <b>failures before</b> the first success (<i>x</i> = 0, 1, 2, …), which gives a mean of (1 − <i>p</i>) / <i>p</i>. Always confirm which definition your course uses; this module uses the trials version.',
+  params:[{id:'p',l:'Probability of success p',min:0.05,max:0.95,v:0.25,s:0.01}],
+  sup:function(p){var r=[],m=geoMaxX(p.p);for(var k=1;k<=m;k++)r.push(k);return r;},
+  pmf:function(k,p){return k<1?0:Math.pow(1-p.p,k-1)*p.p;},
+  mean:function(p){return 1/p.p;},vari:function(p){return (1-p.p)/(p.p*p.p);},inf:2000},
+ hyper:{name:'Hypergeometric',icon:'🃏',
+  models:'The <b>number of successes in a sample drawn without replacement</b> from a finite population that contains <i>K</i> successes out of <i>N</i> items.',
+  conds:['A finite population of <i>N</i> items, <i>K</i> of which are “successes”','A sample of <i>n</i> items is taken <b>without replacement</b>','Each item is a success or a failure'],
+  notation:'<i>X</i> ~ H(<i>N</i>, <i>K</i>, <i>n</i>)',
+  formula:'<i>P</i>(<i>X</i> = <i>x</i>) = C(<i>K</i>, <i>x</i>) · C(<i>N</i>−<i>K</i>, <i>n</i>−<i>x</i>) / C(<i>N</i>, <i>n</i>)',
+  mv:'μ = <i>n</i>(<i>K</i>/<i>N</i>) &nbsp;&nbsp; σ² = <i>n</i>(<i>K</i>/<i>N</i>)(1 − <i>K</i>/<i>N</i>)(<i>N</i> − <i>n</i>)/(<i>N</i> − 1)',
+  tip:'Without replacement the trials are <b>not independent</b>, which is why this is not binomial. If the sample is small relative to the population (a common guideline is <i>n</i> below 10% of <i>N</i>), the binomial with <i>p</i> = <i>K</i>/<i>N</i> is a good approximation.',
+  params:[{id:'N',l:'Population size N',min:5,max:60,v:20,s:1},{id:'K',l:'Successes in population K',min:1,max:60,v:8,s:1},{id:'n',l:'Sample size n',min:1,max:60,v:5,s:1}],
+  fix:function(p){if(p.K>p.N)p.K=p.N;if(p.n>p.N)p.n=p.N;},
+  sup:function(p){var r=[],lo=Math.max(0,p.n-(p.N-p.K)),hi=Math.min(p.n,p.K);for(var k=lo;k<=hi;k++)r.push(k);return r;},
+  pmf:function(k,p){var lo=Math.max(0,p.n-(p.N-p.K)),hi=Math.min(p.n,p.K);if(k<lo||k>hi)return 0;return Math.exp(lnC(p.K,k)+lnC(p.N-p.K,p.n-k)-lnC(p.N,p.n));},
+  mean:function(p){return p.n*p.K/p.N;},
+  vari:function(p){var q=p.K/p.N;return p.N>1?p.n*q*(1-q)*(p.N-p.n)/(p.N-1):0;}},
+ poisson:{name:'Poisson',icon:'📞',
+  models:'The <b>number of events</b> occurring in a fixed interval of time, distance, area or volume, when events happen at a known average rate.',
+  conds:['Events occur <b>independently</b> of one another','The <b>average rate</b> λ per interval is constant','Two events cannot occur at exactly the same instant','The count can be any whole number 0, 1, 2, … (there is no fixed maximum)'],
+  notation:'<i>X</i> ~ P(λ), with <i>X</i> = 0, 1, 2, …',
+  formula:'<i>P</i>(<i>X</i> = <i>x</i>) = <i>e</i><sup>−λ</sup> λ<sup><i>x</i></sup> / <i>x</i>!',
+  mv:'μ = λ &nbsp;&nbsp; σ² = λ',
+  tip:'The mean and the variance are <b>equal</b>. If the interval changes, scale λ: 3 calls per 10 minutes becomes λ = 6 per 20 minutes.',
+  params:[{id:'l',l:'Average rate λ',min:0.5,max:20,v:3,s:0.5}],
+  sup:function(p){var r=[],m=Math.max(8,Math.ceil(p.l+5*Math.sqrt(p.l)+2));for(var k=0;k<=m;k++)r.push(k);return r;},
+  pmf:function(k,p){return k<0?0:Math.exp(-p.l+k*Math.log(p.l)-LF[k]);},
+  mean:function(p){return p.l;},vari:function(p){return p.l;},inf:400}
+};
+var dOrder=['uniform','bernoulli','binomial','geometric','hyper','poisson'];
+var curD='binomial';
+var tabBox=$('#dTabs');
+dOrder.forEach(function(k){
+  var b=el('button',null,D[k].icon+' '+D[k].name);b.setAttribute('role','tab');b.dataset.k=k;
+  b.onclick=function(){curD=k;renderD();};tabBox.appendChild(b);
+});
+function renderD(){
+  var d=D[curD];
+  [].forEach.call(tabBox.children,function(b){b.setAttribute('aria-selected',b.dataset.k===curD?'true':'false');});
+  var P={};d.params.forEach(function(x){P[x.id]=x.v;});
+  var panel=$('#dPanel');
+  panel.innerHTML='';
+  var info=el('div','card');
+  info.innerHTML='<h3>'+d.icon+' '+d.name+' distribution</h3><p><b>What it models:</b> '+d.models+'</p>'+
+    '<b>✔ Conditions to check</b><ul>'+d.conds.map(function(c){return '<li>'+c+'</li>';}).join('')+'</ul>'+
+    '<p><b>Notation:</b> '+d.notation+'</p><div class="formula">'+d.formula+'<br>'+d.mv+'</div>'+
+    '<div class="callout" style="margin:0">💡 '+d.tip+'</div>';
+  panel.appendChild(info);
+  var ex=el('div','card');
+  ex.innerHTML='<h3>🔎 Explorer</h3><div class="ctrl" id="ctl"></div><div class="readout" id="stats"></div><div id="chartHost"></div>'+
+   '<h3 style="margin-top:14px">🧮 Probability calculator</h3><div class="ctrl" style="align-items:end"><div><label for="op">Find</label><select id="op"><option value="eq">P(X = a)</option><option value="le">P(X ≤ a)</option><option value="lt">P(X &lt; a)</option><option value="ge">P(X ≥ a)</option><option value="gt">P(X &gt; a)</option><option value="bt">P(a ≤ X ≤ b)</option></select></div><div><label for="ka">a</label><input type="number" id="ka" step="1" value="2"></div><div id="kbw" style="display:none"><label for="kb">b</label><input type="number" id="kb" step="1" value="4"></div></div><div class="big" id="calcOut"></div>';
+  panel.appendChild(ex);
+  var ctl=$('#ctl',ex);
+  d.params.forEach(function(x){
+    var w=el('div',null,'<label for="s_'+x.id+'">'+x.l+' = <span id="v_'+x.id+'">'+x.v+'</span></label><input type="range" id="s_'+x.id+'" min="'+x.min+'" max="'+x.max+'" step="'+x.s+'" value="'+x.v+'">');
+    ctl.appendChild(w);
+  });
+  function sumP(pred){
+    var s=0,lim=d.inf||0;
+    if(d.inf){for(var k=(curD==='geometric'?1:0);k<=lim;k++)if(pred(k))s+=d.pmf(k,P);}
+    else d.sup(P).forEach(function(k){if(pred(k))s+=d.pmf(k,P);});
+    return Math.min(1,s);
+  }
+  function update(){
+    if(d.fix)d.fix(P);
+    d.params.forEach(function(x){var s=$('#s_'+x.id,ex);s.value=P[x.id];$('#v_'+x.id,ex).textContent=P[x.id];});
+    var xs=d.sup(P),ps=xs.map(function(k){return d.pmf(k,P);});
+    var op=$('#op',ex).value,a=parseFloat($('#ka',ex).value),b=parseFloat($('#kb',ex).value);
+    $('#kbw',ex).style.display=op==='bt'?'block':'none';
+    var f={eq:function(k){return k===a;},le:function(k){return k<=a;},lt:function(k){return k<a;},ge:function(k){return k>=a;},gt:function(k){return k>a;},bt:function(k){return k>=a&&k<=b;}}[op];
+    var lab={eq:'P(X = '+a+')',le:'P(X ≤ '+a+')',lt:'P(X < '+a+')',ge:'P(X ≥ '+a+')',gt:'P(X > '+a+')',bt:'P('+a+' ≤ X ≤ '+b+')'}[op];
+    var val=isNaN(a)||(op==='bt'&&isNaN(b))||a%1!==0||(op==='bt'&&b%1!==0)?NaN:sumP(f);
+    $('#calcOut',ex).textContent=isNaN(val)?'Enter whole numbers for a (and b).':lab+' = '+fmt(val,5);
+    var m=d.mean(P),v=d.vari(P);
+    $('#stats',ex).innerHTML='<span>μ = '+fmt(m,4)+'</span><span>σ² = '+fmt(v,4)+'</span><span>σ = '+fmt(Math.sqrt(v),4)+'</span>';
+    barChart($('#chartHost',ex),xs,ps,isNaN(val)?null:f,{mean:m});
+  }
+  d.params.forEach(function(x){$('#s_'+x.id,ex).oninput=function(e){P[x.id]=parseFloat(e.target.value);update();};});
+  $('#op',ex).onchange=update;$('#ka',ex).oninput=update;$('#kb',ex).oninput=update;
+  if(curD==='geometric'){$('#ka',ex).value=3;}
+  if(curD==='poisson'){$('#ka',ex).value=5;}
+  if(curD==='bernoulli'||curD==='uniform'){$('#ka',ex).value=1;}
+  update();
+}
+renderD();
+
+/* ---------- lesson 4 chooser ---------- */
+(function(){
+  var names=['Uniform','Bernoulli','Binomial','Geometric','Hypergeometric','Poisson'];
+  var sc=[
+   ['A fair coin is tossed 10 times. <i>X</i> is the number of heads.',2,'Fixed <i>n</i> = 10 independent trials with <i>p</i> = 0.5, counting successes.'],
+   ['A coin is tossed until the first head appears. <i>X</i> is the number of tosses.',3,'We count trials until the <b>first</b> success, with no fixed <i>n</i>.'],
+   ['A help desk receives 2 emails per hour on average. <i>X</i> is the number of emails in one hour.',5,'Events in a fixed interval at a known average rate.'],
+   ['Five cards are dealt from a standard deck. <i>X</i> is the number of aces.',4,'Sampling <b>without replacement</b> from a finite population (4 aces in 52 cards).'],
+   ['A fair die is rolled once. <i>X</i> is the number showing.',0,'Six equally likely values, 1 to 6.'],
+   ['One free throw is attempted. <i>X</i> = 1 if it goes in and 0 otherwise.',1,'A single trial with two outcomes.']
+  ];
+  var box=$('#chooser');
+  sc.forEach(function(s){
+    var d=el('div','q');d.appendChild(el('div',null,s[0]));
+    var fb=el('div','fb'),o=el('div','opts');o.style.gridTemplateColumns='repeat(auto-fit,minmax(130px,1fr))';
+    names.forEach(function(n,k){
+      var b=el('button',null,n);
+      b.onclick=function(){
+        var ok=k===s[1];
+        [].forEach.call(o.children,function(x,j){x.disabled=true;if(j===s[1])x.classList.add('right');});
+        if(!ok)b.classList.add('wrong');
+        fb.className='fb show '+(ok?'ok':'no');
+        fb.innerHTML=(ok?'✅ <b>Yes!</b> ':'❌ <b>Answer: '+names[s[1]]+'.</b> ')+s[2];
+      };
+      o.appendChild(b);
+    });
+    d.appendChild(o);d.appendChild(fb);box.appendChild(d);
+  });
+})();
+
+/* ---------- lesson 5 worked examples ---------- */
+(function(){
+  var ex=[
+   {t:'Example 1 · Mean and standard deviation from a table',tag:'General DRV',
+    p:'The number of siblings, <i>X</i>, of a randomly chosen student has this distribution:<br><table class="t"><tr><th><i>x</i></th><td>0</td><td>1</td><td>2</td><td>3</td></tr><tr><th><i>P</i>(<i>x</i>)</th><td>0.1</td><td>0.3</td><td>0.4</td><td>0.2</td></tr></table>Check that it is a valid PDF, then find μ and σ.',
+    s:['<b>Check the rules.</b> Every probability is between 0 and 1, and 0.1 + 0.3 + 0.4 + 0.2 = 1. ✅ Valid.',
+       '<b>Mean.</b> μ = Σ <i>x</i>·<i>P</i>(<i>x</i>) = 0(0.1) + 1(0.3) + 2(0.4) + 3(0.2) = 0.3 + 0.8 + 0.6 = <b>1.7</b> siblings.',
+       '<b>Find <i>E</i>(<i>X</i>²).</b> 0²(0.1) + 1²(0.3) + 2²(0.4) + 3²(0.2) = 0 + 0.3 + 1.6 + 1.8 = 3.7.',
+       '<b>Variance and SD.</b> σ² = 3.7 − 1.7² = 3.7 − 2.89 = 0.81, so σ = √0.81 = <b>0.9</b>.']},
+   {t:'Example 2 · Binomial: defective items',tag:'Binomial',
+    p:'8% of items from a packing line are defective. An inspector takes a random sample of 12 items (treat the items as independent). Find (a) <i>P</i>(exactly 2 defective), (b) <i>P</i>(at least 1 defective), (c) the expected number defective.',
+    s:['<b>Identify the model.</b> Fixed <i>n</i> = 12 independent trials, success = “defective”, <i>p</i> = 0.08. So <i>X</i> ~ B(12, 0.08).',
+       '<b>(a)</b> <i>P</i>(<i>X</i> = 2) = C(12, 2)(0.08)²(0.92)¹⁰ = 66 × 0.0064 × 0.4344 ≈ <b>0.1835</b>.',
+       '<b>(b)</b> Use the complement: <i>P</i>(<i>X</i> ≥ 1) = 1 − <i>P</i>(<i>X</i> = 0) = 1 − (0.92)¹² = 1 − 0.3677 ≈ <b>0.6323</b>.',
+       '<b>(c)</b> μ = <i>np</i> = 12 × 0.08 = <b>0.96</b> defective items on average.']},
+   {t:'Example 3 · Geometric: free throws',tag:'Geometric',
+    p:'A basketball player makes 70% of her free throws, independently. (a) What is the probability her first make is on her 3rd attempt? (b) What is the probability she needs at most 3 attempts? (c) How many attempts are expected?',
+    s:['<b>Identify the model.</b> We count attempts until the first success, so <i>X</i> ~ G(0.7).',
+       '<b>(a)</b> <i>P</i>(<i>X</i> = 3) = (0.3)²(0.7) = 0.09 × 0.7 = <b>0.063</b>.',
+       '<b>(b)</b> <i>P</i>(<i>X</i> ≤ 3) = 1 − (0.3)³ = 1 − 0.027 = <b>0.973</b>.',
+       '<b>(c)</b> μ = 1 / <i>p</i> = 1 / 0.7 ≈ <b>1.43</b> attempts.']},
+   {t:'Example 4 · Hypergeometric: a box of phones',tag:'Hypergeometric',
+    p:'A box holds 20 phones, 5 of them defective. A technician tests 4 phones chosen at random without replacement. Find <i>P</i>(exactly 1 defective) and the expected number of defectives.',
+    s:['<b>Identify the model.</b> Finite population, sampling without replacement: <i>N</i> = 20, <i>K</i> = 5, <i>n</i> = 4. So <i>X</i> ~ H(20, 5, 4).',
+       '<b>Probability.</b> <i>P</i>(<i>X</i> = 1) = C(5, 1) · C(15, 3) / C(20, 4) = (5 × 455) / 4845 = 2275 / 4845 ≈ <b>0.4696</b>.',
+       '<b>Mean.</b> μ = <i>n</i>(<i>K</i>/<i>N</i>) = 4 × 5/20 = <b>1</b> defective phone on average.']},
+   {t:'Example 5 · Poisson: calls to a help line',tag:'Poisson',
+    p:'A help line receives an average of 3 calls every 10 minutes. Find (a) <i>P</i>(exactly 5 calls in 10 minutes), (b) <i>P</i>(at most 2 calls in 10 minutes), (c) <i>P</i>(no calls in 20 minutes).',
+    s:['<b>Identify the model.</b> Events in a fixed interval at a known rate, so <i>X</i> ~ P(3).',
+       '<b>(a)</b> <i>P</i>(<i>X</i> = 5) = <i>e</i>⁻³ · 3⁵ / 5! = 0.04979 × 243 / 120 ≈ <b>0.1008</b>.',
+       '<b>(b)</b> <i>P</i>(<i>X</i> ≤ 2) = <i>e</i>⁻³(1 + 3 + 4.5) = 0.04979 × 8.5 ≈ <b>0.4232</b>.',
+       '<b>(c)</b> <b>Rescale the rate:</b> 20 minutes means λ = 6. Then <i>P</i>(<i>X</i> = 0) = <i>e</i>⁻⁶ ≈ <b>0.0025</b>.']},
+   {t:'Example 6 · Expected value of a raffle',tag:'Expected value',
+    p:'A raffle sells 500 tickets at $2 each. There is one prize of $300. What is your expected profit from buying one ticket?',
+    s:['<b>Define <i>X</i></b> as your profit. If you win, <i>X</i> = 300 − 2 = 298 with probability 1/500. Otherwise <i>X</i> = −2 with probability 499/500.',
+       '<b>Expected value.</b> <i>E</i>(<i>X</i>) = 298(1/500) + (−2)(499/500) = (298 − 998)/500 = <b>−$1.40</b>.',
+       '<b>Interpret.</b> On average you lose $1.40 per ticket. The raffle is “unfair” to the buyer, which is how it raises money.']}
+  ];
+  var box=$('#examples');
+  ex.forEach(function(e,idx){
+    var d=el('details','ex');
+    d.innerHTML='<summary>'+e.t+' <span class="pill">'+e.tag+'</span></summary><p style="margin-top:10px">'+e.p+'</p>';
+    var steps=el('div'),n=0;
+    var btn=el('button','btn','Show next step');
+    btn.onclick=function(){
+      if(n<e.s.length){steps.appendChild(el('div','step',e.s[n]));n++;}
+      if(n>=e.s.length){btn.disabled=true;btn.textContent='All steps shown ✅';}
+      else btn.textContent='Show next step ('+(n+1)+' of '+e.s.length+')';
+    };
+    btn.textContent='Show next step (1 of '+e.s.length+')';
+    d.appendChild(btn);d.appendChild(steps);box.appendChild(d);
+    if(idx===0)d.open=true;
+  });
+})();
+
+/* ---------- lesson 6 applications ---------- */
+(function(){
+  var apps=[
+   ['🏭 Quality control','Binomial / Hypergeometric','Factories inspect a sample of items. Binomial models a large production run; hypergeometric fits a small box sampled without replacement. Decision rule: reject the batch if too many defects are found.'],
+   ['📞 Service and traffic','Poisson','Calls per hour at a help desk, vehicles per minute at a junction, or customers per hour at a shop. Managers use P(X ≥ k) to decide how many staff are needed.'],
+   ['🏀 Sports and sales','Geometric','Attempts until a first success: shots until the first goal, sales calls until the first sale. The mean 1/p tells you how many attempts to plan for.'],
+   ['📝 Multiple-choice tests','Binomial','Guessing on 10 questions with 4 choices each: <i>X</i> ~ B(10, 0.25). The mean score from pure guessing is 2.5, which shows why guessing is a poor strategy.'],
+   ['🃏 Games and lotteries','Hypergeometric / Uniform','Cards dealt without replacement are hypergeometric; random draws from a numbered list are uniform. Expected value shows whether a game favours the player or the house.'],
+   ['🏥 Health and safety','Poisson / Binomial','Number of patients arriving per hour, or how many people in a sample of 20 carry a trait that is present in 12% of a population.'],
+   ['🌦️ Weather and environment','Poisson','Count of storms in a season, or flood events per decade, modelled with an average rate λ. If the counts vary far more than the mean (variance much larger than λ), the Poisson model fits poorly and should be reconsidered.'],
+   ['🏫 Education','Binomial / Uniform','Number of students who attend a class of 30 when each has a 90% chance of attending; a random seating or raffle draw by student number.']
+  ];
+  var box=$('#apps');
+  apps.forEach(function(a){box.appendChild(el('div','dcard','<b>'+a[0]+'</b><br><span class="pill">'+a[1]+'</span><p style="margin:8px 0 0">'+a[2]+'</p>'));});
+  function w(){
+    var p=+$('#wpIn').value/100,n=+$('#wnIn').value;
+    $('#wp').textContent=$('#wpIn').value;$('#wn').textContent=n;
+    var r=1-Math.pow(1-p,n);
+    $('#wOut').textContent='P(batch rejected) = 1 − (1 − '+p.toFixed(2)+')^'+n+' = '+fmt(r,4)+'  ('+(r*100).toFixed(1)+'%)';
+  }
+  $('#wpIn').oninput=w;$('#wnIn').oninput=w;w();
+})();
+
+/* ---------- lesson 7 final quiz ---------- */
+makeQuiz($('#finalQuiz'),[
+ {q:'Which situation is best modelled by a binomial distribution?',opts:['The number of cars arriving at a junction in an hour','The number of heads in 8 tosses of a fair coin','The number of tosses until the first head','The number of aces in a 5-card hand'],ans:1,why:'Fixed <i>n</i> = 8, independent trials, constant <i>p</i> = 0.5.'},
+ {q:'For <i>X</i> ~ B(5, 0.4), what is the variance?',opts:['2','1.2','0.24','0.4'],ans:1,why:'σ² = <i>npq</i> = 5 × 0.4 × 0.6 = 1.2.'},
+ {q:'A salesperson makes a sale on 25% of calls. What is the expected number of calls to the first sale?',opts:['0.25','2.5','4','25'],ans:2,why:'Geometric: μ = 1/<i>p</i> = 1/0.25 = 4.'},
+ {q:'Arrivals at a clinic follow a Poisson distribution with mean 4 per hour. What is the variance of the hourly count?',opts:['2','4','16','It cannot be found'],ans:1,why:'For a Poisson variable the variance equals the mean, so σ² = 4.'},
+ {q:'Why is “number of hearts in 5 cards dealt from a deck” hypergeometric rather than binomial?',opts:['There are more than two suits','The cards are drawn without replacement, so the trials are not independent','The deck has 52 cards','Hearts are not equally likely'],ans:1,why:'Each card removed changes the probabilities for the next card, so independence fails.'},
+ {q:'Which of these cannot be a probability distribution for <i>x</i> = 1, 2, 3?',opts:['0.2, 0.5, 0.3','0.6, 0.3, 0.1','0.5, 0.4, 0.3','1, 0, 0'],ans:2,why:'0.5 + 0.4 + 0.3 = 1.2, which is more than 1.'},
+ {q:'A fair coin is tossed 4 times. Find <i>P</i>(exactly 2 heads). (decimal)',num:0.375,tol:0.005,why:'C(4, 2)(0.5)⁴ = 6/16 = 0.375.'},
+ {q:'For <i>X</i> ~ P(2), find <i>P</i>(<i>X</i> = 0). (decimal, 3 places)',num:0.135,tol:0.003,why:'<i>e</i>⁻² × 2⁰ / 0! = <i>e</i>⁻² ≈ 0.1353.'}
+],function(s,n){
+  var msg=s===n?'🏆 Perfect score! ':s>=n*0.7?'🌟 Well done! ':'💪 Good effort. Review the lessons and try again. ';
+  $('#finalScore').textContent=msg+'Score: '+s+' / '+n;
+});
+
+go(0);
+</script>
+</body>
+</html>
